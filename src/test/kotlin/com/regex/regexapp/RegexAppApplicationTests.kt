@@ -1,4 +1,4 @@
-package com.example.regexapp
+package com.regex.regexapp
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

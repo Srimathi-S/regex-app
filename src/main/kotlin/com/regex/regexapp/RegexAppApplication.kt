@@ -1,10 +1,10 @@
-package com.example.regexapp
+package com.regex.regexapp
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class RegexAppApplication
+open class RegexAppApplication
 
 fun main(args: Array<String>) {
     runApplication<RegexAppApplication>(*args)
