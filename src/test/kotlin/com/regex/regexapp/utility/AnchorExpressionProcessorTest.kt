@@ -11,7 +11,7 @@ class AnchorExpressionProcessorTest {
 
     @BeforeEach
     internal fun setUp() {
-        anchorExpressionProcessor = AnchorExpressionProcessor("/src/test/resources/anchor.csv");
+        anchorExpressionProcessor = AnchorExpressionProcessor("/src/test/resources/anchor.csv")
     }
 
     @Test

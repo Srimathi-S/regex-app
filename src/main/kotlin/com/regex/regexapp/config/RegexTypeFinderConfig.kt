@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties("regex.config-file")
-open class RegexTypeFinderConfig(var anchorConfig: String = "") {
+open class RegexTypeFinderConfig(private var anchorConfig: String = "") {
 
     @Bean("anchorConfig")
     open fun anchorConfigFile(): String {

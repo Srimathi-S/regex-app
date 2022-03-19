@@ -3,8 +3,7 @@ package com.regex.regexapp.config
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class RegexTypeFinderConfigTest(
-) {
+class RegexTypeFinderConfigTest {
 
     private lateinit var regexTypeFinderConfig: RegexTypeFinderConfig
 

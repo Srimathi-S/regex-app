@@ -19,13 +19,13 @@ class AnchorExpressionProcessor(@Autowired anchorConfig: String) : ExpressionPro
 
 
     override fun firstMatchedExpression(regex: Regex): Triple<Int, String, String>? {
-        val anchorExpressions: List<String> = expressionList.map { anchorExpression -> anchorExpression.expression }
+        val anchorExpressionsList: List<String> = expressionList.map { anchorExpression -> anchorExpression.expression }
         return regex.expression
-            .findAnyOf(anchorExpressions)?.let { anchorExpressions ->
+            .findAnyOf(anchorExpressionsList)?.let { anchorExpression ->
                 val description = expressionList.find {
-                    it.expression == anchorExpressions.second
+                    it.expression == anchorExpression.second
                 }?.description ?: ""
-                Triple(anchorExpressions.first + anchorExpressions.second.length, anchorExpressions.second, description)
+                Triple(anchorExpression.first + anchorExpression.second.length, anchorExpression.second, description)
             }
     }
 
