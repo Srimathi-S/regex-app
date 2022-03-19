@@ -1,0 +1,3 @@
+regex:
+  config-file:
+    anchor-config: /src/test/resources/anchor.csv

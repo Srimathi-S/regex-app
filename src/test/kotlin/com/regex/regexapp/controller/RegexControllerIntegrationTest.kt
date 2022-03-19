@@ -14,16 +14,16 @@ import org.springframework.web.reactive.function.BodyInserters
 
 @SpringBootTest
 @AutoConfigureWebTestClient
-class RegexIntegrationTest(
+class RegexControllerIntegrationTest(
     @Autowired
     val webTestClient: WebTestClient
 ) {
 
     @Test
     fun `should return conjunction of two regex when the api is called`() {
-        val addRegexRequest = AddRegexRequest(Regex("abc"),Regex("def"))
+        val addRegexRequest = AddRegexRequest(Regex("abc"), Regex("def"))
 
-        val result =webTestClient
+        val result = webTestClient
             .post()
             .uri("/and")
             .body(BodyInserters.fromValue(addRegexRequest))

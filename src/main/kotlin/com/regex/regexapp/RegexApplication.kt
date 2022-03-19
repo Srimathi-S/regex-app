@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-open class RegexAppApplication
+open class RegexApplication
 
 fun main(args: Array<String>) {
-    runApplication<RegexAppApplication>(*args)
+    runApplication<RegexApplication>(*args)
 }
