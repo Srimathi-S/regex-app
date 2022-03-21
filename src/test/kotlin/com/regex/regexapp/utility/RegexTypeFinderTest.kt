@@ -39,6 +39,16 @@ class RegexTypeFinderTest(
 
         assertEquals(expectedDescription, description)
     }
+
+    @Test
+    fun `should return empty list when given regex is empty`() {
+        val regex = Regex("")
+        val expectedDescription = listOf<String>()
+
+        val description = regexTypeFinder.describe(regex)
+
+        assertEquals(expectedDescription, description)
+    }
 }
 
 

@@ -25,7 +25,11 @@ class AnchorExpressionProcessor(@Autowired anchorConfig: String) : ExpressionPro
                 val description = expressionList.find {
                     it.expression == anchorExpression.second
                 }?.description ?: ""
-                Triple(anchorExpression.first + anchorExpression.second.length, anchorExpression.second, description)
+                Triple(
+                    anchorExpression.first + anchorExpression.second.length,
+                    anchorExpression.second,
+                    description
+                )
             }
     }
 
