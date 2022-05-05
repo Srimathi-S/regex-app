@@ -1,0 +1,4 @@
+[*],matches one of characters in list 1
+[^*],not matches any of characters in list 1
+[.-.],matches any character from 1
+[^.-.],not in range of character from 1

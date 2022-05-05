@@ -1,3 +1,4 @@
 regex:
   config-file:
     anchor-config: /src/test/resources/anchor.csv
+    range-config: /src/test/resources/range.csv

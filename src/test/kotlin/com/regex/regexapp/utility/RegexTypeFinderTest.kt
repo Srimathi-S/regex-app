@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import com.regex.regexapp.model.Regex
 
-@SpringBootTest(properties = ["regex.config-file.anchor-config: /src/test/resources/anchor.csv"])
+@SpringBootTest
 class RegexTypeFinderTest(
     @Autowired val regexTypeFinder: RegexTypeFinder
 ) {
@@ -49,6 +49,27 @@ class RegexTypeFinderTest(
 
         assertEquals(expectedDescription, description)
     }
+
+    @Test
+    fun `should return definition of regex with range expression`() {
+        val regex = Regex("[a-b]")
+        val expectedDescription = listOf("matches any character from a-b")
+
+        val description = regexTypeFinder.describe(regex)
+
+        assertEquals(expectedDescription, description)
+    }
+
+    @Test
+    fun `should return definition of regex with anchor and range expression`() {
+        val regex = Regex("^[^a-b]")
+        val expectedDescription = listOf("Start of string","not in range of character from a-b")
+
+        val description = regexTypeFinder.describe(regex)
+
+        assertEquals(expectedDescription, description)
+    }
+
 }
 
 

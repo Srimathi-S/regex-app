@@ -1,5 +1,6 @@
 package com.regex.regexapp.utility
 
+import com.regex.regexapp.model.MatchedElement
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import com.regex.regexapp.model.Regex
@@ -8,6 +9,8 @@ import com.regex.regexapp.model.Regex
 class RegexTypeFinder(
     @Autowired
     private val anchorExpressionProcessor: AnchorExpressionProcessor,
+    @Autowired
+    private val rangeExpressionProcessor: RangeExpressionProcessor,
 ) {
 
     fun describe(regex: Regex): List<String> {
@@ -16,15 +19,15 @@ class RegexTypeFinder(
         val length = expression.length
 
         var processedIndex = 0
-        var incrementor = 1
+        var currentIndex = 1
 
-        (0..length step incrementor).forEach { currentIndex ->
-            val currentExpression = expression.substring(processedIndex, currentIndex)
+        while(currentIndex <= length) {
+            var incrementor = 1
 
-            anchorExpressionProcessor.firstMatchedExpression(Regex(currentExpression))
-                ?.let { (matchedTill, matchedExpression, matchedExpressionDescription) ->
+            matchedElement(expression, processedIndex, currentIndex)
+                ?.let { (matchedStart, matchedTill, matchedExpressionDescription) ->
                     val unprocessedElementsStart = if (processedIndex != 0) processedIndex + 1 else processedIndex
-                    val unprocessedElementsEnd = currentIndex - matchedExpression.length
+                    val unprocessedElementsEnd = currentIndex - matchedTill + matchedStart
                     descriptionList
                         .addAll(returnUnprocessedElements(unprocessedElementsStart, unprocessedElementsEnd, expression))
 
@@ -34,7 +37,9 @@ class RegexTypeFinder(
                     }
 
                     descriptionList.add(matchedExpressionDescription)
-                } ?: return@forEach
+                }
+
+            currentIndex +=incrementor
         }
 
         descriptionList.addAll(returnUnprocessedElements(processedIndex, length, expression))
@@ -42,9 +47,33 @@ class RegexTypeFinder(
         return descriptionList
     }
 
+    private fun matchedElement(expression: String, processedIndex: Int, currentIndex: Int): MatchedElement? {
+        val currentExpression = expression.substring(processedIndex, currentIndex)
+        return anchorExpressionProcessor.firstMatchedExpression(Regex(currentExpression))
+            .switchIfNull {
+                shouldProcessAsRangeExpression(expression, processedIndex, expression)
+            }
+    }
+
+    private fun shouldProcessAsRangeExpression(
+        currentExpression: String,
+        processedIndex: Int,
+        expression: String,
+    ): MatchedElement? {
+        val rangeExpressionStarter = '['
+        val rangeExpressionEnd = ']'
+        if (processedIndex<expression.length && currentExpression[processedIndex] == rangeExpressionStarter) {
+            val find = currentExpression.indexOf(rangeExpressionEnd,processedIndex)
+            if (find != -1) {
+                return rangeExpressionProcessor.firstMatchedExpression(Regex(expression.substring(processedIndex, find + 1)))
+            }
+        }
+        return null
+    }
+
     private fun indexChanger(
         processedIndex: Int,
-        totalProcessedLength: Int
+        totalProcessedLength: Int,
     ): Pair<Int, Int> {
         return Pair(processedIndex + totalProcessedLength + 1, processedIndex + totalProcessedLength)
     }
@@ -62,5 +91,12 @@ class RegexTypeFinder(
     }
 
 
+}
+
+private fun MatchedElement?.switchIfNull(function: () -> MatchedElement?): MatchedElement? {
+    if (this == null) {
+        return function()
+    }
+    return this
 }
 
