@@ -47,7 +47,7 @@ class AnchorExpressionProcessorTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = ["src/test/resources/anchor.csv"])
+    @CsvFileSource(files = ["src/test/resources/anchor.csv"] , delimiter = '|')
     fun `return correct definition for all anchor expression in list`(expression: String, definition: String) {
         val actual = anchorExpressionProcessor.firstMatchedExpression(Regex(expression))
 

@@ -43,7 +43,7 @@ fun readCsv(fileName: String): List<RegexDefinition> {
     return CSVReaderBuilder(FileReader(currentDirectory + fileName))
         .withCSVParser(
             CSVParserBuilder()
-                .withSeparator(',')
+                .withSeparator('|')
                 .withEscapeChar('#')
                 .build()
         )
@@ -132,4 +132,13 @@ class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProce
         const val inversionCharacter = '^'
         val nonMatchers = listOf(inversionCharacter, '-')
     }
+}
+
+class QuantifierExpressionProcessor(quantifierConfig: String) : ExpressionProcessor {
+    override val regexDefinitionList: List<RegexDefinition> = readCsv(quantifierConfig)
+
+    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
+       return MatchedElement(1, 5, "matches previous token between 3 and 6 times")
+    }
+
 }

@@ -1,8 +1,8 @@
-^,Start of string
-\A,Start of string
-$,End of string
-\Z,End of string
-\b,Word boundary
-\B,Not word boundary
-\<,Start of word
-\>,End of word
+^|Start of string
+\A|Start of string
+$|End of string
+\Z|End of string
+\b|Word boundary
+\B|Not word boundary
+\<|Start of word
+\>|End of word
