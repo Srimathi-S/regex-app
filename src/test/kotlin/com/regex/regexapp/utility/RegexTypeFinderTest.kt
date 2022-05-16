@@ -70,6 +70,33 @@ class RegexTypeFinderTest(
         assertEquals(expectedDescription, description)
     }
 
+    @Test
+    fun `should return definition of regex with quantifier`() {
+        val actual = regexTypeFinder.describe(Regex("a{3,6}"))
+
+        val expectedDescription = listOf("a","matches previous token between 3,6 times")
+
+        assertEquals(expectedDescription, actual)
+    }
+
+    @Test
+    fun `should return definition of regex with quantifier and anchor tags`() {
+        val actual = regexTypeFinder.describe(Regex("^a+"))
+
+        val expectedDescription = listOf("Start of string","a","matches previous token 1 or more times")
+
+        assertEquals(expectedDescription, actual)
+    }
+
+    @Test
+    fun `should return definition of regex with quantifier,range and anchor tags`() {
+        val actual = regexTypeFinder.describe(Regex("^a*[1-3]"))
+
+        val expectedDescription = listOf("Start of string","a","matches previous token 0 or more times","matches any character from 1-3")
+
+        assertEquals(expectedDescription, actual)
+    }
+
 }
 
 

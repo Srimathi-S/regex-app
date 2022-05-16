@@ -11,6 +11,8 @@ class RegexTypeFinder(
     private val anchorExpressionProcessor: AnchorExpressionProcessor,
     @Autowired
     private val rangeExpressionProcessor: RangeExpressionProcessor,
+    @Autowired
+    private val quantifierExpressionProcessor: QuantifierExpressionProcessor,
 ) {
 
     fun describe(regex: Regex): List<String> {
@@ -26,7 +28,7 @@ class RegexTypeFinder(
 
             matchedElement(expression, processedIndex, currentIndex)
                 ?.let { (matchedStart, matchedTill, matchedExpressionDescription) ->
-                    val unprocessedElementsStart = if (processedIndex != 0) processedIndex + 1 else processedIndex
+                    val unprocessedElementsStart = processedIndex
                     val unprocessedElementsEnd = currentIndex - matchedTill + matchedStart
                     descriptionList
                         .addAll(returnUnprocessedElements(unprocessedElementsStart, unprocessedElementsEnd, expression))
@@ -49,10 +51,12 @@ class RegexTypeFinder(
 
     private fun matchedElement(expression: String, processedIndex: Int, currentIndex: Int): MatchedElement? {
         val currentExpression = expression.substring(processedIndex, currentIndex)
-        return anchorExpressionProcessor.firstMatchedExpression(Regex(currentExpression))
+        val regex = Regex(currentExpression)
+        return anchorExpressionProcessor.firstMatchedExpression(regex)
             .switchIfNull {
                 shouldProcessAsRangeExpression(expression, processedIndex, expression)
             }
+            .switchIfNull { quantifierExpressionProcessor.firstMatchedExpression(regex) }
     }
 
     private fun shouldProcessAsRangeExpression(

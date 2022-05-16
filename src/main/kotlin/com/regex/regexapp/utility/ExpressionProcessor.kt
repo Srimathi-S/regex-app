@@ -5,67 +5,19 @@ import com.opencsv.CSVReaderBuilder
 import com.regex.regexapp.model.MatchedElement
 import com.regex.regexapp.model.RegexDefinition
 import com.regex.regexapp.model.Regex
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import java.io.FileReader
 
-sealed interface ExpressionProcessor {
+interface ExpressionProcessor {
     val regexDefinitionList: List<RegexDefinition>
     fun firstMatchedExpression(regex: Regex): MatchedElement?
-}
 
-@Component
-class AnchorExpressionProcessor(@Autowired anchorConfig: String) : ExpressionProcessor {
-    override val regexDefinitionList: List<RegexDefinition> = readCsv(anchorConfig)
-
-
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
-        val anchorExpressionsList: List<String> =
-            regexDefinitionList.map { anchorExpression -> anchorExpression.expression }
-        return regex.expression
-            .findAnyOf(anchorExpressionsList)?.let { anchorExpression ->
-                val description = regexDefinitionList.find {
-                    it.expression == anchorExpression.second
-                }?.description ?: ""
-                MatchedElement(
-                    anchorExpression.first,
-                    anchorExpression.first + anchorExpression.second.length,
-                    description
-                )
-            }
-    }
-
-}
-
-
-fun readCsv(fileName: String): List<RegexDefinition> {
-    val currentDirectory = System.getProperty("user.dir")
-    return CSVReaderBuilder(FileReader(currentDirectory + fileName))
-        .withCSVParser(
-            CSVParserBuilder()
-                .withSeparator('|')
-                .withEscapeChar('#')
-                .build()
-        )
-        .build()
-        .map { line ->
-            RegexDefinition(line[0], line[1])
-        }
-}
-
-@Component
-class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProcessor {
-    override val regexDefinitionList: List<RegexDefinition> = readCsv(rangeConfig)
-
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
-        val expression = regex.expression
-        return regexDefinitionList.mapNotNull { matchingRange(it, expression) }.firstOrNull()
-    }
-
-    private fun matchingRange(regexDefinition: RegexDefinition, regexExpression: String): MatchedElement? {
+    fun matchExpressionWithDefinition(regexDefinition: RegexDefinition, regex: Regex , usesAnyCharacterMatcher: Boolean = true, usesAnyStringMatcher: Boolean = true): MatchedElement? {
         val expressionToCompare = regexDefinition.expression
         val expressionToCompareLength = expressionToCompare.length
-        val firstMatch = regexExpression.toCharArray().indexOf(expressionToCompare[0]) + 1
+        val regexExpression = regex.expression
+        val foundIndex = regexExpression.toCharArray().indexOf(expressionToCompare[0])
+        if(foundIndex == -1) return null
+        val firstMatch = foundIndex + 1
         var regexIndex = firstMatch
         var expressionToCompareIndex = 1
         val regexLength = regexExpression.length
@@ -76,7 +28,7 @@ class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProce
                     regexIndex++
                     expressionToCompareIndex++
                 }
-                expressionToCompare[expressionToCompareIndex] == anyStringMatcher -> {
+                usesAnyStringMatcher && expressionToCompare[expressionToCompareIndex] == anyStringMatcher -> {
                     val index = handleMatchAnyCharacter(expressionToCompareIndex,
                         expressionToCompareLength,
                         expressionToCompare,
@@ -85,7 +37,7 @@ class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProce
                     expressionToCompareIndex = index.first
                     regexIndex = index.second
                 }
-                expressionToCompare[expressionToCompareIndex] == anyCharacterMatcher -> {
+                usesAnyCharacterMatcher && expressionToCompare[expressionToCompareIndex] == anyCharacterMatcher -> {
                     regexIndex++
                     expressionToCompareIndex++
                 }
@@ -96,15 +48,15 @@ class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProce
         }
 
         if (expressionToCompareIndex == expressionToCompareLength) {
-            val stringToReplace = regexExpression.substring(firstMatch, regexIndex - 1)
-                    .replace(inversionCharacter.toString(), "")
-
-            return MatchedElement(firstMatch - 1,
-                regexIndex,
-                descriptionMaker(regexDefinition, stringToReplace))
+            return if (regexDefinition.description.contains("_"))
+                matchedElementWithReplacedDescription(regexExpression, firstMatch, regexIndex, regexDefinition)
+            else
+                MatchedElement(firstMatch - 1, regexIndex, regexDefinition.description)
         }
+
         return null
     }
+
 
     private fun handleMatchAnyCharacter(
         definedIndex: Int,
@@ -123,22 +75,44 @@ class RangeExpressionProcessor(@Autowired rangeConfig: String) : ExpressionProce
         return Pair(definedIndex + 1, regexIndex + 1)
     }
 
-    private fun descriptionMaker(regexDefinition: RegexDefinition, stringToReplace: String) =
-        regexDefinition.description.replace("1", stringToReplace)
+    private fun matchedElementWithReplacedDescription(
+        regexExpression: String,
+        firstMatch: Int,
+        regexIndex: Int,
+        regexDefinition: RegexDefinition,
+    ): MatchedElement {
+        val stringToReplace = regexExpression.substring(firstMatch, regexIndex - 1)
+            .replace(inversionCharacter.toString(), "")
+            .trim(',')
+
+        return MatchedElement(firstMatch - 1,
+            regexIndex,
+            regexDefinition.description.replace(stringToBeReplaced, stringToReplace))
+    }
+
 
     companion object {
         const val anyStringMatcher = '*'
         const val anyCharacterMatcher = '.'
         const val inversionCharacter = '^'
         val nonMatchers = listOf(inversionCharacter, '-')
+        const val stringToBeReplaced = "_"
     }
 }
 
-class QuantifierExpressionProcessor(quantifierConfig: String) : ExpressionProcessor {
-    override val regexDefinitionList: List<RegexDefinition> = readCsv(quantifierConfig)
 
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
-       return MatchedElement(1, 5, "matches previous token between 3 and 6 times")
-    }
-
+fun readCsv(fileName: String): List<RegexDefinition> {
+    val currentDirectory = System.getProperty("user.dir")
+    return CSVReaderBuilder(FileReader(currentDirectory + fileName))
+        .withCSVParser(
+            CSVParserBuilder()
+                .withSeparator('|')
+                .withEscapeChar('#')
+                .build()
+        )
+        .build()
+        .map { line ->
+            RegexDefinition(line[0], line[1])
+        }
 }
+

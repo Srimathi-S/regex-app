@@ -1,1 +1,6 @@
-{.,.}|matches previous token between 1 times
+{.,.}|matches previous token between _ times
+*|matches previous token 0 or more times
++|matches previous token 1 or more times
+?|matches previous token 0 or 1 times
+{.,}|matches previous token _ or more times
+{.}|matches previous token exactly _ times

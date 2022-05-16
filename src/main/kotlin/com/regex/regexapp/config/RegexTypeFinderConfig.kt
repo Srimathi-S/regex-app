@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties("regex.config-file")
-open class RegexTypeFinderConfig(var anchorConfig: String = "", var rangeConfig: String = "") {
+open class RegexTypeFinderConfig(var anchorConfig: String = "", var rangeConfig: String = "", var quantifierConfig: String = "") {
 
     @Bean("anchorConfig")
     open fun anchorConfigFile(): String {
@@ -16,6 +16,11 @@ open class RegexTypeFinderConfig(var anchorConfig: String = "", var rangeConfig:
     @Bean("rangeConfig")
     open fun rangeConfigFile(): String {
         return rangeConfig
+    }
+
+    @Bean("quantifierConfig")
+    open fun quantifierConfigFile(): String {
+        return quantifierConfig
     }
 }
 
