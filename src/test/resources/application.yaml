@@ -3,3 +3,4 @@ regex:
     anchor-config: /src/test/resources/anchor.csv
     range-config: /src/test/resources/range.csv
     quantifier-config: /src/test/resources/quantifier.csv
+    groupAssertion-config: /src/test/resources/groupAssertion.csv

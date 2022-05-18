@@ -11,12 +11,17 @@ interface ExpressionProcessor {
     val regexDefinitionList: List<RegexDefinition>
     fun firstMatchedExpression(regex: Regex): MatchedElement?
 
-    fun matchExpressionWithDefinition(regexDefinition: RegexDefinition, regex: Regex , usesAnyCharacterMatcher: Boolean = true, usesAnyStringMatcher: Boolean = true): MatchedElement? {
+    fun matchExpressionWithDefinition(
+        regexDefinition: RegexDefinition,
+        regex: Regex,
+        usesAnyCharacterMatcher: Boolean = true,
+        usesAnyStringMatcher: Boolean = true,
+    ): MatchedElement? {
         val expressionToCompare = regexDefinition.expression
         val expressionToCompareLength = expressionToCompare.length
         val regexExpression = regex.expression
         val foundIndex = regexExpression.toCharArray().indexOf(expressionToCompare[0])
-        if(foundIndex == -1) return null
+        if (foundIndex == -1) return null
         val firstMatch = foundIndex + 1
         var regexIndex = firstMatch
         var expressionToCompareIndex = 1
@@ -59,20 +64,20 @@ interface ExpressionProcessor {
 
 
     private fun handleMatchAnyCharacter(
-        definedIndex: Int,
-        definedLength: Int,
-        definedExpression: String,
+        expressionToCompareIndex: Int,
+        expressionToCompareLength: Int,
+        expressionToCompare: String,
         regexExpression: String,
         regexIndex: Int,
     ): Pair<Int, Int> {
-        if (definedIndex + 1 < definedLength && definedExpression[definedIndex + 1] == regexExpression[regexIndex]) {
-            return Pair(definedIndex + 2, regexIndex + 1)
+        if (expressionToCompareIndex + 1 < expressionToCompareLength && expressionToCompare[expressionToCompareIndex + 1] == regexExpression[regexIndex]) {
+            return Pair(expressionToCompareIndex + 2, regexIndex + 1)
         } else {
             if (!nonMatchers.contains(regexExpression[regexIndex])) {
-                return Pair(definedIndex, regexIndex + 1)
+                return Pair(expressionToCompareIndex, regexIndex + 1)
             }
         }
-        return Pair(definedIndex + 1, regexIndex + 1)
+        return Pair(expressionToCompareIndex + 1, regexIndex + 1)
     }
 
     private fun matchedElementWithReplacedDescription(
@@ -81,13 +86,13 @@ interface ExpressionProcessor {
         regexIndex: Int,
         regexDefinition: RegexDefinition,
     ): MatchedElement {
-        val stringToReplace = regexExpression.substring(firstMatch, regexIndex - 1)
+        val replacementString = regexExpression.substring(firstMatch, regexIndex - 1)
             .replace(inversionCharacter.toString(), "")
             .trim(',')
 
         return MatchedElement(firstMatch - 1,
             regexIndex,
-            regexDefinition.description.replace(stringToBeReplaced, stringToReplace))
+            regexDefinition.description.replace(stringToBeReplaced, replacementString))
     }
 
 
