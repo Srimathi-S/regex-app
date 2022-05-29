@@ -9,17 +9,16 @@ import java.io.FileReader
 
 interface ExpressionProcessor {
     val regexDefinitionList: List<RegexDefinition>
-    fun firstMatchedExpression(regex: Regex): MatchedElement?
+    fun firstMatchedExpression(regex: String): MatchedElement?
 
     fun matchExpressionWithDefinition(
         regexDefinition: RegexDefinition,
-        regex: Regex,
+        regexExpression: String,
         usesAnyCharacterMatcher: Boolean = true,
         usesAnyStringMatcher: Boolean = true,
     ): MatchedElement? {
         val expressionToCompare = regexDefinition.expression
         val expressionToCompareLength = expressionToCompare.length
-        val regexExpression = regex.expression
         val foundIndex = regexExpression.toCharArray().indexOf(expressionToCompare[0])
         if (foundIndex == -1) return null
         val firstMatch = foundIndex + 1

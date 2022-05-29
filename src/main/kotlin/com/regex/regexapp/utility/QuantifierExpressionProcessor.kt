@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class QuantifierExpressionProcessor(quantifierConfig: String) : ExpressionProcessor {
     override val regexDefinitionList: List<RegexDefinition> = readCsv(quantifierConfig)
 
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
+    override fun firstMatchedExpression(regex: String): MatchedElement? {
        return regexDefinitionList.mapNotNull{
            matchExpressionWithDefinition(it,regex)
        }.firstOrNull()

@@ -18,7 +18,7 @@ class GroupAssertionExpressionProcessorTest {
     @ParameterizedTest
     @CsvFileSource(files = ["src/test/resources/groupAssertion.csv"] , delimiter = '|')
     fun `return correct definition for all group assertion expression in list when it is at beginning group`(expression: String, definition: String) {
-        val actual = groupAssertionExpressionProcessor.firstMatchedExpression(Regex("($expression)"))
+        val actual = groupAssertionExpressionProcessor.firstMatchedExpression("($expression)")
 
         Assertions.assertEquals(MatchedElement(1, 1+expression.length, definition), actual)
     }
@@ -26,7 +26,7 @@ class GroupAssertionExpressionProcessorTest {
     @ParameterizedTest
     @CsvFileSource(files = ["src/test/resources/groupAssertion.csv"] , delimiter = '|')
     fun `return correct definition for all group assertion expression in list when it is at last group`(expression: String, definition: String) {
-        val actual = groupAssertionExpressionProcessor.firstMatchedExpression(Regex("abc($expression)"))
+        val actual = groupAssertionExpressionProcessor.firstMatchedExpression("abc($expression)")
 
         Assertions.assertEquals(MatchedElement(4, 4+expression.length, definition), actual)
     }

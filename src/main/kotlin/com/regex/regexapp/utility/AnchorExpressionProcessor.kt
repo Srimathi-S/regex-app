@@ -11,9 +11,9 @@ class AnchorExpressionProcessor(@Autowired anchorConfig: String) : ExpressionPro
     override val regexDefinitionList: List<RegexDefinition> = readCsv(anchorConfig)
 
 
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
+    override fun firstMatchedExpression(regex: String): MatchedElement? {
         return regexDefinitionList.mapNotNull{
-            matchExpressionWithDefinition(it,regex, usesAnyCharacterMatcher = false, usesAnyStringMatcher = false)
+            matchExpressionWithDefinition(it, regex , usesAnyCharacterMatcher = false, usesAnyStringMatcher = false)
         }.firstOrNull()
     }
 

@@ -25,13 +25,13 @@ class RegexTypeFinder(
         }
     }
 
-    private fun separateGroup(regex: Regex): List<Regex> {
+    private fun separateGroup(regex: Regex): List<String> {
         val groupExpressionStarter = '('
         val groupExpressionEnd = ')'
         val expression = regex.expression
         var start = 0
         var unprocessedStart = 0
-        val groupList = mutableListOf<Regex>()
+        val groupList = mutableListOf<String>()
 
         val length = expression.length
 
@@ -40,7 +40,7 @@ class RegexTypeFinder(
                 unprocessedGroup(expression, unprocessedStart, start)?.let { groupList.add(it) }
 
                 val groupEndIndex = expression.indexOf(groupExpressionEnd, start)
-                groupList.add(createRegex(expression, start + 1, groupEndIndex))
+                groupList.add(createSubstring(expression, start + 1, groupEndIndex))
 
                 start = groupEndIndex + 1
                 unprocessedStart = groupEndIndex + 1
@@ -58,20 +58,19 @@ class RegexTypeFinder(
         expression: String,
         start: Int,
         end: Int,
-    ): Regex? {
-        if (end > start) return createRegex(expression, start, end)
+    ): String? {
+        if (end > start) return createSubstring(expression, start, end)
         return null
     }
 
-    private fun individualGroupProcessor(regex: Regex): MutableList<String> {
+    private fun individualGroupProcessor(expression: String): MutableList<String> {
         val descriptionList = mutableListOf<String>()
-        val expression = regex.expression
         val length = expression.length
 
         var processedIndex = 0
         var currentIndex = 1
 
-        groupAssertionExpressionProcessor.firstMatchedExpression(regex)
+        groupAssertionExpressionProcessor.firstMatchedExpression(expression)
             ?.let { (_, matchedTill, matchedExpressionDescription) ->
                 descriptionList.add(matchedExpressionDescription)
                 processedIndex = matchedTill
@@ -106,12 +105,11 @@ class RegexTypeFinder(
 
     private fun matchedElement(expression: String, processedIndex: Int, currentIndex: Int): MatchedElement? {
         val currentExpression = expression.substring(processedIndex, currentIndex)
-        val regex = Regex(currentExpression)
-        return anchorExpressionProcessor.firstMatchedExpression(regex)
+        return anchorExpressionProcessor.firstMatchedExpression(currentExpression)
             .switchIfNull {
                 processForRangeExpression(processedIndex, expression)
             }
-            .switchIfNull { quantifierExpressionProcessor.firstMatchedExpression(regex) }
+            .switchIfNull { quantifierExpressionProcessor.firstMatchedExpression(currentExpression) }
     }
 
     private fun processForRangeExpression(
@@ -123,13 +121,13 @@ class RegexTypeFinder(
         if (processedIndex < expression.length && expression[processedIndex] == rangeExpressionStarter) {
             val rangeEndIndex = expression.indexOf(rangeExpressionEnd, processedIndex)
             if (rangeEndIndex != -1) {
-                return posixExpressionProcessor.firstMatchedExpression(createRegex(expression,
+                return posixExpressionProcessor.firstMatchedExpression(createSubstring(expression,
                     processedIndex + 1,
                     rangeEndIndex + 1))
                     ?.let {
                         MatchedElement(processedIndex + 1, rangeEndIndex + 2, it.description)
                     }.switchIfNull {
-                        rangeExpressionProcessor.firstMatchedExpression(createRegex(expression,
+                        rangeExpressionProcessor.firstMatchedExpression(createSubstring(expression,
                             processedIndex,
                             rangeEndIndex + 1))
                     }
@@ -157,8 +155,8 @@ class RegexTypeFinder(
             .mapTo(list) { expression[it].toString() }
     }
 
-    private fun createRegex(expression: String, startIndex: Int, endIndex: Int) =
-        Regex(expression.substring(startIndex, endIndex))
+    private fun createSubstring(expression: String, startIndex: Int, endIndex: Int) =
+        expression.substring(startIndex, endIndex)
 }
 
 private fun MatchedElement?.switchIfNull(function: () -> MatchedElement?): MatchedElement? {

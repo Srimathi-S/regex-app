@@ -1,7 +1,9 @@
 package com.regex.regexapp.model
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class RegexTest {
 
@@ -42,5 +44,12 @@ class RegexTest {
         val conjunction = regex1.and(regex2)
 
         assertTrue(conjunction == Regex("(a{1})(a{2})"))
+    }
+
+    @Test
+    fun `should throw exception for invalid regex`() {
+        val assertThrows = assertThrows<Exception> { Regex("?=abc") }
+
+        assertEquals(assertThrows.message,"Invalid regex pattern")
     }
 }

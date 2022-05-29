@@ -19,7 +19,7 @@ class AnchorExpressionProcessorTest {
 
     @Test
     fun `should return index at which anchor expression is found when it is at the start`() {
-        val actual = anchorExpressionProcessor.firstMatchedExpression(Regex("^"))
+        val actual = anchorExpressionProcessor.firstMatchedExpression("^")
 
         assertEquals(MatchedElement(0, 1, "Start of string"), actual)
     }
@@ -27,21 +27,21 @@ class AnchorExpressionProcessorTest {
 
     @Test
     fun `should return index at which anchor expression is found when it is at the last`() {
-        val actual = anchorExpressionProcessor.firstMatchedExpression(Regex("hel$"))
+        val actual = anchorExpressionProcessor.firstMatchedExpression("hel$")
 
         assertEquals(MatchedElement(3, 4, "End of string"), actual)
     }
 
     @Test
     fun `should return index at which first anchor expression is found when there are more than 1 expressions`() {
-        val actual = anchorExpressionProcessor.firstMatchedExpression(Regex("helo\\A\\B"))
+        val actual = anchorExpressionProcessor.firstMatchedExpression("helo\\A\\B")
 
         assertEquals(MatchedElement(4, 6, "Start of string"), actual)
     }
 
     @Test
     fun `should return null at which anchor expression is not there in the string`() {
-        val actual = anchorExpressionProcessor.firstMatchedExpression(Regex("hello"))
+        val actual = anchorExpressionProcessor.firstMatchedExpression("hello")
 
         assertNull(actual)
     }
@@ -49,7 +49,7 @@ class AnchorExpressionProcessorTest {
     @ParameterizedTest
     @CsvFileSource(files = ["src/test/resources/anchor.csv"] , delimiter = '|')
     fun `return correct definition for all anchor expression in list`(expression: String, definition: String) {
-        val actual = anchorExpressionProcessor.firstMatchedExpression(Regex(expression))
+        val actual = anchorExpressionProcessor.firstMatchedExpression(expression)
 
         assertEquals(MatchedElement(0, expression.length, definition), actual)
     }

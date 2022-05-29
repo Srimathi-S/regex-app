@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class GroupAssertionExpressionProcessor(@Autowired groupAssertionConfig : String) : ExpressionProcessor{
     override val regexDefinitionList: List<RegexDefinition> = readCsv(groupAssertionConfig)
 
-    override fun firstMatchedExpression(regex: Regex): MatchedElement? {
+    override fun firstMatchedExpression(regex: String): MatchedElement? {
        return regexDefinitionList.mapNotNull { matchExpressionWithDefinition(it,regex,
            usesAnyCharacterMatcher = false,
            usesAnyStringMatcher = false) }.firstOrNull()
