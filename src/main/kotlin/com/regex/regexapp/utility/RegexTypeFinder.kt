@@ -15,6 +15,8 @@ class RegexTypeFinder(
     private val quantifierExpressionProcessor: QuantifierExpressionProcessor,
     @Autowired
     private val groupAssertionExpressionProcessor: GroupAssertionExpressionProcessor,
+    @Autowired
+    private val posixExpressionProcessor: PosixExpressionProcessor,
 ) {
 
     fun describe(regex: Regex): List<MutableList<String>> {
@@ -35,7 +37,7 @@ class RegexTypeFinder(
 
         while (start < length) {
             if (expression[start] == groupExpressionStarter) {
-                unprocessedGroup(expression,unprocessedStart, start)?.let { groupList.add(it) }
+                unprocessedGroup(expression, unprocessedStart, start)?.let { groupList.add(it) }
 
                 val groupEndIndex = expression.indexOf(groupExpressionEnd, start)
                 groupList.add(createRegex(expression, start + 1, groupEndIndex))
@@ -47,7 +49,7 @@ class RegexTypeFinder(
             }
         }
 
-        unprocessedGroup(expression,unprocessedStart, length)?.let { groupList.add(it) }
+        unprocessedGroup(expression, unprocessedStart, length)?.let { groupList.add(it) }
 
         return groupList
     }
@@ -121,9 +123,16 @@ class RegexTypeFinder(
         if (processedIndex < expression.length && expression[processedIndex] == rangeExpressionStarter) {
             val rangeEndIndex = expression.indexOf(rangeExpressionEnd, processedIndex)
             if (rangeEndIndex != -1) {
-                return rangeExpressionProcessor.firstMatchedExpression(createRegex(expression,
-                    processedIndex,
+                return posixExpressionProcessor.firstMatchedExpression(createRegex(expression,
+                    processedIndex + 1,
                     rangeEndIndex + 1))
+                    ?.let {
+                        MatchedElement(processedIndex + 1, rangeEndIndex + 2, it.description)
+                    }.switchIfNull {
+                        rangeExpressionProcessor.firstMatchedExpression(createRegex(expression,
+                            processedIndex,
+                            rangeEndIndex + 1))
+                    }
             }
         }
         return null

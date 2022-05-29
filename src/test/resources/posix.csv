@@ -1,0 +1,13 @@
+[:upper:]|Upper case letters
+[:lower:]|Lower case letters
+[:alpha:]|All letters
+[:alnum:]|Digits and letters
+[:digit:]|Digits
+[:xdigit:]|Hexadecimal digits
+[:punct:]|Punctuation
+[:blank:]|Space and tab
+[:space:]|Blank characters
+[:cntrl:]|Control characters
+[:graph:]|Printed characters
+[:print:]|Printed characters and spaces
+[:word:]|Digits, letters and underscore

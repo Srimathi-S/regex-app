@@ -11,6 +11,7 @@ open class RegexTypeFinderConfig(
     var rangeConfig: String = "",
     var quantifierConfig: String = "",
     var groupAssertionConfig: String = "",
+    var posixConfig: String = "",
 ) {
 
     @Bean("anchorConfig")
@@ -31,6 +32,11 @@ open class RegexTypeFinderConfig(
     @Bean("groupAssertionConfig")
     open fun groupAssertionConfigFile(): String {
         return groupAssertionConfig
+    }
+
+    @Bean("posixConfig")
+    open fun posixConfigFile(): String {
+        return posixConfig
     }
 }
 

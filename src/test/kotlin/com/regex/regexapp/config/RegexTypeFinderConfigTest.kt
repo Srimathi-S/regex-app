@@ -9,10 +9,13 @@ class RegexTypeFinderConfigTest {
 
     @BeforeEach
     internal fun setUp() {
-        regexTypeFinderConfig = RegexTypeFinderConfig("/src/test/resources/anchor.csv",
+        regexTypeFinderConfig = RegexTypeFinderConfig(
+            "/src/test/resources/anchor.csv",
             "/src/test/resources/range.csv",
             "/src/test/resources/quantifier.csv",
-            "/src/test/resources/groupAssertionConfig.csv")
+            "/src/test/resources/groupAssertionConfig.csv",
+            "/src/test/resources/rangeConfig.csv",
+        )
     }
 
     @Test
@@ -33,5 +36,10 @@ class RegexTypeFinderConfigTest {
     @Test
     fun `should return correct groupAssertionConfig config file name with the given filename config`() {
         regexTypeFinderConfig.quantifierConfigFile().compareTo("/src/test/resources/groupAssertionConfig.csv")
+    }
+
+    @Test
+    fun `should return correct posixConfig config file name with the given filename config`() {
+        regexTypeFinderConfig.quantifierConfigFile().compareTo("/src/test/resources/posixConfig.csv")
     }
 }

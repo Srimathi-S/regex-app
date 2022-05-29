@@ -4,3 +4,4 @@ regex:
     range-config: /src/main/resources/range.csv
     quantifier-config: /src/main/resources/quantifier.csv
     groupAssertion-config: /src/main/resources/groupAssertion.csv
+    posix-config: /src/main/resources/posix.csv

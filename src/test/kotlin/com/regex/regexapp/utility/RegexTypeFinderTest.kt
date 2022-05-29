@@ -133,6 +133,15 @@ class RegexTypeFinderTest(
         assertEquals(expectedDescription, actual)
     }
 
+    @Test
+    fun `should return definition of regex with posix tag`() {
+        val actual = regexTypeFinder.describe(Regex("[[:upper:]]"))
+
+        val expectedDescription = listOf(listOf("Upper case letters"))
+
+        assertEquals(expectedDescription, actual)
+    }
+
 }
 
 

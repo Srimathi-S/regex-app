@@ -53,7 +53,7 @@ interface ExpressionProcessor {
         }
 
         if (expressionToCompareIndex == expressionToCompareLength) {
-            return if (regexDefinition.description.contains("_"))
+            return if (regexDefinition.description.contains(stringToBeReplaced))
                 matchedElementWithReplacedDescription(regexExpression, firstMatch, regexIndex, regexDefinition)
             else
                 MatchedElement(firstMatch - 1, regexIndex, regexDefinition.description)
@@ -70,7 +70,9 @@ interface ExpressionProcessor {
         regexExpression: String,
         regexIndex: Int,
     ): Pair<Int, Int> {
-        if (expressionToCompareIndex + 1 < expressionToCompareLength && expressionToCompare[expressionToCompareIndex + 1] == regexExpression[regexIndex]) {
+        val canStartMatchingNextCharacter =
+            expressionToCompareIndex + 1 < expressionToCompareLength && expressionToCompare[expressionToCompareIndex + 1] == regexExpression[regexIndex]
+        if (canStartMatchingNextCharacter) {
             return Pair(expressionToCompareIndex + 2, regexIndex + 1)
         } else {
             if (!nonMatchers.contains(regexExpression[regexIndex])) {
