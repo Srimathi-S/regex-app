@@ -63,7 +63,7 @@ class RegexTypeFinderTest(
     @Test
     fun `should return definition of regex with anchor and range expression`() {
         val regex = Regex("^[^a-b]")
-        val expectedDescription = listOf(listOf("Start of string","not in range of character from a-b"))
+        val expectedDescription = listOf(listOf("Start of string","not matches any character from a-b"))
 
         val description = regexTypeFinder.describe(regex)
 
@@ -90,9 +90,9 @@ class RegexTypeFinderTest(
 
     @Test
     fun `should return definition of regex with quantifier,range and anchor tags`() {
-        val actual = regexTypeFinder.describe(Regex("^a*[1-3]"))
+        val actual = regexTypeFinder.describe(Regex("^a[1-3]*"))
 
-        val expectedDescription = listOf(listOf("Start of string","a","matches previous token 0 or more times","matches any character from 1-3"))
+        val expectedDescription = listOf(listOf("Start of string","a","matches any character from 1-3", "matches previous token 0 or more times"))
 
         assertEquals(expectedDescription, actual)
     }
@@ -138,6 +138,33 @@ class RegexTypeFinderTest(
         val actual = regexTypeFinder.describe(Regex("[[:upper:]]"))
 
         val expectedDescription = listOf(listOf("Upper case letters"))
+
+        assertEquals(expectedDescription, actual)
+    }
+
+    @Test
+    fun `should return definition of regex with multiple range tags`() {
+        val actual = regexTypeFinder.describe(Regex("[1-3a-b]"))
+
+        val expectedDescription = listOf(listOf("matches any character from 1-3 or matches any character from a-b"))
+
+        assertEquals(expectedDescription, actual)
+    }
+
+    @Test
+    fun `should return definition of regex with posix range tags`() {
+        val actual = regexTypeFinder.describe(Regex("[1-3a-b[:digit:]]"))
+
+        val expectedDescription = listOf(listOf("matches any character from 1-3 or matches any character from a-b or Digits"))
+
+        assertEquals(expectedDescription, actual)
+    }
+
+    @Test
+    fun `should return definition of regex with multiple non matching range tags`() {
+        val actual = regexTypeFinder.describe(Regex("[^1-3a-b]"))
+
+        val expectedDescription = listOf(listOf("not matches any character from 1-3 and not matches any character from a-b"))
 
         assertEquals(expectedDescription, actual)
     }

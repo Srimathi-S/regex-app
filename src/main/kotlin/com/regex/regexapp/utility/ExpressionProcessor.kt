@@ -4,12 +4,11 @@ import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import com.regex.regexapp.model.MatchedElement
 import com.regex.regexapp.model.RegexDefinition
-import com.regex.regexapp.model.Regex
 import java.io.FileReader
 
 interface ExpressionProcessor {
     val regexDefinitionList: List<RegexDefinition>
-    fun firstMatchedExpression(regex: String): MatchedElement?
+    fun firstMatchExpression(regex: String): MatchedElement?
 
     fun matchExpressionWithDefinition(
         regexDefinition: RegexDefinition,
@@ -19,8 +18,8 @@ interface ExpressionProcessor {
     ): MatchedElement? {
         val expressionToCompare = regexDefinition.expression
         val expressionToCompareLength = expressionToCompare.length
-        val foundIndex = regexExpression.toCharArray().indexOf(expressionToCompare[0])
-        if (foundIndex == -1) return null
+        val foundIndex = firstMatch(regexExpression, expressionToCompare,usesAnyCharacterMatcher)
+        if (foundIndex < 0) return null
         val firstMatch = foundIndex + 1
         var regexIndex = firstMatch
         var expressionToCompareIndex = 1
@@ -61,6 +60,14 @@ interface ExpressionProcessor {
         return null
     }
 
+    fun firstMatch(regexExpression: String, expressionToCompare: String, usesAnyCharacterMatcher: Boolean): Int {
+        val isFirstCharAnyCharacterMatcher =
+            usesAnyCharacterMatcher && expressionToCompare[0] == anyCharacterMatcher && expressionToCompare.length > 1
+        val regexArray = regexExpression.toCharArray()
+        return if (isFirstCharAnyCharacterMatcher) regexArray.indexOf(expressionToCompare[1]) - 1 else regexArray.indexOf(
+            expressionToCompare[0])
+    }
+
 
     private fun handleMatchAnyCharacter(
         expressionToCompareIndex: Int,
@@ -81,7 +88,7 @@ interface ExpressionProcessor {
         return Pair(expressionToCompareIndex + 1, regexIndex + 1)
     }
 
-    private fun matchedElementWithReplacedDescription(
+    fun matchedElementWithReplacedDescription(
         regexExpression: String,
         firstMatch: Int,
         regexIndex: Int,
