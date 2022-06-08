@@ -12,6 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.test.StepVerifier
+import javax.validation.Validation
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -19,6 +20,8 @@ class RegexControllerIntegrationTest(
     @Autowired
     val webTestClient: WebTestClient
 ) {
+    private val validationFactory = Validation.buildDefaultValidatorFactory()
+    private val validator = validationFactory.validator
 
     @Test
     fun `should return conjunction of two regex when the api is called`() {
@@ -64,11 +67,7 @@ class RegexControllerIntegrationTest(
 
     @Test
     fun `should return bad request when the api is called with improper regex`() {
-        val regex = object {
-            init {
-                val expression = "^[^a-"
-            }
-        }
+        val regex = Regex("^[^a-")
 
         val responseBody = webTestClient
             .post()
@@ -86,6 +85,4 @@ class RegexControllerIntegrationTest(
             .verifyComplete()
 
     }
-
-
 }

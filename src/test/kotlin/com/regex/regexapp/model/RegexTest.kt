@@ -45,11 +45,4 @@ class RegexTest {
 
         assertTrue(conjunction == Regex("(a{1})(a{2})"))
     }
-
-    @Test
-    fun `should throw exception for invalid regex`() {
-        val assertThrows = assertThrows<Exception> { Regex("?=abc") }
-
-        assertEquals(assertThrows.message,"Invalid regex pattern")
-    }
 }
