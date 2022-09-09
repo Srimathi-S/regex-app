@@ -8,7 +8,7 @@ Run `./gradlew build` and start the application
 
 Replace the {regexExpression} with the regex expression you want to know the description to
 
-##For example
+## For example
 
 ##### `curl -X POST -H "Content-Type: application/json" -d '{"expression": "[0-9]{3}"}'  http://localhost:8080/describe`
 
